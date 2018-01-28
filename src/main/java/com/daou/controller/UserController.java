@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
+import com.daou.util.HttpSessionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,20 @@ public class UserController {
     }
 
     @GetMapping("/{id}/form")
-    public String updateFrom(@PathVariable Long id, Model model) {
+    public String updateFrom(@PathVariable Long id, Model model, HttpSession session) {
+        if (!HttpSessionUtils.isLoginUser(session)) {
+            return "redirect:/users/loginForm";
+        }
+
+        User loginUser = HttpSessionUtils.getUserFromHttpSession(session);
+
+        log.info(" PathVariable Long id : " + id + ", loginUser.getId() : " + loginUser.getId());
+        log.info(" loginUser.matchID(id) : " + loginUser.matchID(id));
+
+        if (!loginUser.matchID(id)) {
+            throw new IllegalStateException("자신의 정보만 수정 가능합니다.");
+        }
+
 
         log.info(" id : " + id);
         User user = userRepository.findOne(id);
@@ -56,9 +70,18 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public String update(@PathVariable Long id, User updateUser) {
+    public String update(@PathVariable Long id, User updateUser, HttpSession session) {
+        if (!HttpSessionUtils.isLoginUser(session)) {
+            return "redirect:/users/loginForm";
+        }
 
-        User user = userRepository.findOne(id);
+        User loginUser = HttpSessionUtils.getUserFromHttpSession(session);
+
+        if (!loginUser.matchID(id)) {
+            throw new IllegalStateException("자신의 정보만 수정 가능합니다.");
+        }
+
+        User user = userRepository.findOne(loginUser.getId());
         user.update(updateUser);
 
         // 언제 save, 언제 update인지 ?
@@ -100,5 +123,6 @@ public class UserController {
         session.removeAttribute("loginUser");
         return "redirect:/";
     }
+
 
 }

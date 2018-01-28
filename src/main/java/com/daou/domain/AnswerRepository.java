@@ -3,6 +3,8 @@ package com.daou.domain;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 
-public interface UserRepository extends JpaRepository<User, Long>, QueryDslPredicateExecutor<User> {
-    User findByUserId(String userId);
+/**
+ * Created by hongjong-wan on 2018. 1. 3..
+ */
+public interface AnswerRepository extends JpaRepository<Answer, Long>, QueryDslPredicateExecutor<Answer> {
 }

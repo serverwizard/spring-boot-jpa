@@ -1,23 +1,27 @@
 package com.daou.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.List;
 
 @Entity
 public class User {
 
+//	private static final Logger log = LoggerFactory.getLogger(User.class);
 	@Id
 	@GeneratedValue
 	private Long id;
 
-	@Column(nullable = false, length = 20)
+	@Column(nullable = false, length = 20, unique = true)
 	private String userId;
 
 	private String password;
 	private String name;
 	private String email;
+
 
 	public Long getId() {
 		return id;
@@ -59,11 +63,6 @@ public class User {
 		this.email = email;
 	}
 
-	@Override
-	public String toString() {
-		return "User [id=" + id + ", userId=" + userId + ", password=" + password + ", name=" + name + ", email="
-				+ email + "]";
-	}
 	
 
 	public void update(User updateUser) {
@@ -79,5 +78,30 @@ public class User {
 		return password.equals(this.password);
 	}
 
+    /*
+         objects == checks to see if the variables refer to the same object reference.
+         To compare the value of the objects you should use the equals() method E.g.
+     */
+	public boolean matchID(Long id) {
+		if(id == null) {
+			return false;
+		}
+//		log.info(" this.id : " + this.id + ", id : " + id);
+		return this.id.equals(id);
+	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		User user = (User) o;
+
+		return userId != null ? userId.equals(user.userId) : user.userId == null;
+	}
+
+	@Override
+	public int hashCode() {
+		return userId != null ? userId.hashCode() : 0;
+	}
 }
